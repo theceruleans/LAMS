@@ -23,19 +23,21 @@ Type `/lams` and Claude describes what it sees. Append a question to focus the a
 
 ## Installation
 
-Copy `lams.md` into your Claude Code skills directory:
-
-**Windows**
-```
-%APPDATA%\Claude\skills\lams.md
+**Windows (PowerShell)**
+```powershell
+curl -o "$env:APPDATA\Claude\skills\lams.md" https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
 **macOS / Linux**
-```
-~/.claude/skills/lams.md
+```bash
+curl -o ~/.claude/skills/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
 Restart Claude Code. The `/lams` command will be available immediately.
+
+Or manually copy `lams.md` into your skills directory:
+- Windows: `%APPDATA%\Claude\skills\`
+- macOS / Linux: `~/.claude/skills/`
 
 ---
 
