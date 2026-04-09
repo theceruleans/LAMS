@@ -56,7 +56,7 @@ The full skill definition is in [`lams.md`](lams.md). This is the prompt Claude 
 
 ## Author
 
-Created by [@theceruleans](https://github.com/theceruleans)
+Created by **Habib Anibaba** ([@theceruleans](https://github.com/theceruleans))
 
 ---
 
