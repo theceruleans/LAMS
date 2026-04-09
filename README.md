@@ -16,7 +16,7 @@ Type `/lams` and Claude describes what it sees. Append a question to focus the a
 
 - [Claude Code](https://claude.ai/code) — CLI, desktop app, or IDE extension
 - One of the following MCP tools enabled in your Claude Code session:
-  - **[Windows-MCP](https://github.com/anthropics/windows-mcp)** *(Windows — recommended)*
+  - **Windows-MCP** (`ant.dir.cursortouch.windows-mcp`) *(Windows — recommended, install via Claude Extensions)*
   - **[Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP)** *(cross-platform fallback)*
 
 ---
@@ -25,19 +25,20 @@ Type `/lams` and Claude describes what it sees. Append a question to focus the a
 
 **Windows (PowerShell)**
 ```powershell
-curl -o "$env:APPDATA\Claude\skills\lams.md" https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
+New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\commands" | Out-Null
+curl.exe -o "$env:USERPROFILE\.claude\commands\lams.md" https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
 **macOS / Linux**
 ```bash
-curl -o ~/.claude/skills/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
+curl -o ~/.claude/commands/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
 Restart Claude Code. The `/lams` command will be available immediately.
 
 Or manually copy `lams.md` into your skills directory:
-- Windows: `%APPDATA%\Claude\skills\`
-- macOS / Linux: `~/.claude/skills/`
+- Windows: `%USERPROFILE%\.claude\commands\`
+- macOS / Linux: `~/.claude/commands/`
 
 ---
 

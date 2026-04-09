@@ -7,7 +7,7 @@ Take a screenshot of the user's screen and analyse it.
 1. Detect the best available screenshot tool:
    - **Windows-MCP available:** use `mcp__Windows-MCP__Screenshot`
    - **Desktop Commander available:** run PowerShell via `mcp__Desktop_Commander__start_process` to capture to `$env:TEMP\lams.png`, then read with `mcp__Desktop_Commander__read_file`
-   - **Neither available:** instruct the user to run `python lams.py` and paste the saved path back
+   - **Neither available:** inform the user that a supported MCP tool is required and link them to the requirements in the README
 
 2. Capture the screenshot using the selected tool.
 
