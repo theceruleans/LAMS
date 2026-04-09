@@ -55,6 +55,12 @@ The full skill definition is in [`lams.md`](lams.md). This is the prompt Claude 
 
 ---
 
+## Support
+
+If LAMS saved you time, consider buying me a coffee — [paypal.me/ceruleanalpha](https://paypal.me/ceruleanalpha)
+
+---
+
 ## Author
 
 Created by **Habib Anibaba** ([@theceruleans](https://github.com/theceruleans))
