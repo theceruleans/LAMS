@@ -6,27 +6,29 @@ Analyse the user's screen using the lowest-token method that answers the questio
 
 | Method | Cost | Use when |
 |--------|------|----------|
-| Copy text via Desktop Commander | ★☆☆☆ | Text, code, page content visible on screen |
+| Copy text | ★☆☆☆ | Text, code, page content visible on screen |
 | Window screenshot (bounds only) | ★★★☆ | Layout, visual UI, colour, position |
-| Full screenshot | ★★★★ AVOID | Never — always prefer window-only capture |
+| Full screenshot | ★★★★ AVOID | Last resort only |
 
 ---
 
 ## Steps
 
-### 1. Decide the best capture method
+### 1. Detect OS
 
-Before screenshotting, ask: can this be answered without an image?
+Check the system prompt for the current OS before selecting any tool. Never assume.
 
-- **Text/code/data visible on screen?** → copy it directly (Step 2A)
-- **Visual layout or UI needed?** → take a window screenshot (Step 2B)
-- **Never** take a full-screen screenshot
+- `darwin` / `macOS` → use macOS steps below
+- `win32` / `Windows` → use Windows steps below
+- `linux` → use Linux steps below
 
 ---
 
-### 2A. Copy text (cheapest — Desktop Commander)
+### 2A. Copy text (cheapest)
 
-**macOS:**
+Try this before screenshotting. If the answer is in the text, stop here.
+
+**macOS (Desktop Commander):**
 ```bash
 osascript -e 'tell application "App Name" to activate'
 sleep 0.3
@@ -37,32 +39,56 @@ sleep 0.1
 pbpaste
 ```
 
-**Windows:**
+**Windows (Desktop Commander):**
 ```powershell
 Add-Type -AssemblyName System.Windows.Forms
-[System.Windows.Forms.SendKeys]::SendWait("^a")
-Start-Sleep -Milliseconds 100
-[System.Windows.Forms.SendKeys]::SendWait("^c")
-Start-Sleep -Milliseconds 100
+$wsh = New-Object -ComObject WScript.Shell
+$wsh.SendKeys("^a")
+Start-Sleep -Milliseconds 150
+$wsh.SendKeys("^c")
+Start-Sleep -Milliseconds 150
 [System.Windows.Forms.Clipboard]::GetText()
 ```
 
-Read stdout directly — no image tokens used.
+**Linux (Desktop Commander — requires `xclip` and `xdotool`):**
+```bash
+xdotool key ctrl+a
+sleep 0.1
+xdotool key ctrl+c
+sleep 0.1
+xclip -selection clipboard -o
+```
 
 ---
 
 ### 2B. Window screenshot (only when visual is needed)
 
-**Step 1 — Scroll to relevant content first (macOS):**
+**Step 1 — Scroll to relevant content first:**
+
+**macOS:**
 ```bash
 osascript -e 'tell application "App Name" to activate'
-sleep 0.3
-osascript -e 'tell application "System Events" to key code 125' # down arrow, repeat as needed
+sleep 0.2
+# Repeat as needed
+osascript -e 'tell application "System Events" to key code 125'
 ```
 
-**Step 2 — Capture exact window bounds only (not full screen):**
+**Windows:**
+```powershell
+$wsh = New-Object -ComObject WScript.Shell
+$wsh.SendKeys("{PGDN}")
+```
 
-**macOS — Desktop Commander:**
+**Linux:**
+```bash
+xdotool key Page_Down
+```
+
+---
+
+**Step 2 — Capture exact window bounds (not full screen):**
+
+**macOS (Desktop Commander — preferred):**
 ```bash
 BOUNDS=$(osascript -e '
 tell application "System Events"
@@ -82,18 +108,28 @@ screencapture -R "${X},${Y},${W},${H}" /tmp/lams-shot.png
 Then read `/tmp/lams-shot.png` into vision context.
 
 **Windows — Windows-MCP (preferred):**
-Use `mcp__Windows-MCP__Screenshot`
+```
+mcp__Windows-MCP__Screenshot
+```
 
-**Windows — Desktop Commander fallback:**
+**Windows — Desktop Commander fallback (requires .NET):**
 ```powershell
-Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing
 $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
-$graphics = [System.Drawing.Graphics]::FromImage($bmp)
-$graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
+$g = [System.Drawing.Graphics]::FromImage($bmp)
+$g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
 $bmp.Save("$env:TEMP\lams.png")
 ```
 Then read `$env:TEMP\lams.png` into vision context.
+
+**Linux — Desktop Commander (requires `scrot` and `xdotool`):**
+```bash
+# Get active window bounds
+eval $(xdotool getactivewindow getwindowgeometry --shell)
+scrot -a "${X},${Y},${WIDTH},${HEIGHT}" /tmp/lams-shot.png
+```
+Then read `/tmp/lams-shot.png` into vision context.
 
 ---
 
@@ -108,7 +144,7 @@ Then read `$env:TEMP\lams.png` into vision context.
 
 ## Notes
 
-- Never take a full-screen screenshot — always capture window bounds only on macOS
+- Never take a full-screen screenshot — always prefer window bounds only
 - One screenshot per task — extract everything needed before taking another
 - If capture fails after one attempt, stop and inform the user rather than retrying with the same method
-- Do not assume OS — check the system prompt before selecting a tool
+- On Linux, `scrot`, `xdotool`, and `xclip` must be installed — inform the user if missing

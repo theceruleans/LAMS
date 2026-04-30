@@ -12,30 +12,76 @@ Type `/lams` and Claude describes what it sees. Append a question to focus the a
 
 ---
 
-## What's new
-
-- **Token-efficient by default** — LAMS tries text extraction before screenshotting. Images are only used when visuals actually matter.
-- **Window-only screenshots** — no more full-screen captures on macOS. LAMS reads the exact window bounds and crops to them.
-- **Scroll before capture** — scrolls to relevant content before screenshotting.
-
----
-
 ## How it works
 
-LAMS is a **Claude Code slash command** — a markdown file that Claude reads as instructions when you type `/lams`. It is not an MCP server. It uses MCP tools that are already connected to your session (Desktop Commander or Windows-MCP) to capture and read your screen.
+LAMS is a **Claude Code slash command** — a markdown file Claude reads as instructions when you type `/lams`. It is not an MCP server. It uses MCP tools already connected to your session to capture and read your screen, choosing the cheapest method that answers the question.
 
 ---
 
-## Requirements
+## Platform support
 
-- [Claude Code](https://claude.ai/code) — CLI, desktop app, or IDE extension
-- One of the following MCP tools enabled in your Claude Code session:
-  - **Windows-MCP** (`ant.dir.cursortouch.windows-mcp`) *(Windows — recommended, install via Claude Extensions)*
-  - **[Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP)** *(cross-platform)*
+| Platform | Status | Required tools |
+|----------|--------|----------------|
+| macOS | ✅ Full support | Desktop Commander MCP |
+| Windows | ✅ Full support | Windows-MCP *(recommended)* or Desktop Commander MCP |
+| Linux | ⚠️ Experimental | Desktop Commander MCP + `scrot` + `xdotool` + `xclip` |
+
+---
+
+## Requirements by platform
+
+### macOS
+
+- [Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP)
+
+Install Desktop Commander via Claude Code:
+```
+/mcp add desktop-commander
+```
+Or follow the [Desktop Commander setup guide](https://github.com/wonderwhy-er/DesktopCommanderMCP).
+
+---
+
+### Windows
+
+**Option A — Windows-MCP (recommended)**
+
+Install via Claude Extensions: search `ant.dir.cursortouch.windows-mcp` in the Extensions panel.
+
+**Option B — Desktop Commander MCP (fallback)**
+
+Requires [Node.js](https://nodejs.org) installed. Then:
+```
+/mcp add desktop-commander
+```
+
+---
+
+### Linux (experimental)
+
+Requires [Desktop Commander MCP](https://github.com/wonderwhy-er/DesktopCommanderMCP) plus these system tools:
+
+```bash
+# Debian / Ubuntu
+sudo apt install scrot xdotool xclip
+
+# Arch
+sudo pacman -S scrot xdotool xclip
+
+# Fedora
+sudo dnf install scrot xdotool xclip
+```
+
+Linux support is community-tested. If you run into issues, [open an issue](https://github.com/theceruleans/LAMS/issues).
 
 ---
 
 ## Installation
+
+**macOS / Linux**
+```bash
+curl -o ~/.claude/commands/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
+```
 
 **Windows (PowerShell)**
 ```powershell
@@ -43,22 +89,29 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\commands" | Out-Nu
 curl.exe -o "$env:USERPROFILE\.claude\commands\lams.md" https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
-**macOS / Linux**
-```bash
-curl -o ~/.claude/commands/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
-```
-
 Restart Claude Code. The `/lams` command will be available immediately.
 
 Or manually copy `lams.md` into your commands directory:
-- Windows: `%USERPROFILE%\.claude\commands\`
 - macOS / Linux: `~/.claude/commands/`
+- Windows: `%USERPROFILE%\.claude\commands\`
+
+---
+
+## Share your own skills
+
+LAMS is distributed as a single markdown file — the simplest way to share Claude Code skills. To share your own:
+
+1. Create a public GitHub repo with your `skillname.md` file in the root
+2. Add a one-line curl install command to your README (same pattern as above)
+3. Users drop the file into `~/.claude/commands/` and restart Claude Code
+
+That's it — no packaging, no registry, no build step.
 
 ---
 
 ## Master Prompt
 
-The full skill definition is in [`lams.md`](lams.md). You can also paste it directly into any Claude session that has Desktop Commander or Windows-MCP available, without installing the skill file.
+The full skill definition is in [`lams.md`](lams.md). You can paste it directly into any Claude session that has Desktop Commander or Windows-MCP available, without installing the skill file.
 
 ---
 
