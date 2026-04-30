@@ -6,11 +6,9 @@ Analyse the user's screen using the lowest-token method that answers the questio
 
 | Method | Cost | Use when |
 |--------|------|----------|
-| Copy text / `pbpaste` | ★☆☆☆ | Reading text, code, page content |
-| `get_page_text` (Chrome MCP) | ★☆☆☆ | Web page content, no layout needed |
-| `read_page filter:interactive` (Chrome MCP) | ★★☆☆ | Finding buttons, inputs, links |
-| Window screenshot + zoom region | ★★★☆ | Layout, visual UI, colour, position |
-| Full screenshot | ★★★★ AVOID | Never — always use window-only capture |
+| Copy text via Desktop Commander | ★☆☆☆ | Text, code, page content visible on screen |
+| Window screenshot (bounds only) | ★★★☆ | Layout, visual UI, colour, position |
+| Full screenshot | ★★★★ AVOID | Never — always prefer window-only capture |
 
 ---
 
@@ -20,55 +18,51 @@ Analyse the user's screen using the lowest-token method that answers the questio
 
 Before screenshotting, ask: can this be answered without an image?
 
-- **Text/code/data on screen?** → copy it directly (Step 2A)
-- **Web page content needed?** → use `get_page_text` or `read_page` (Step 2B)
-- **Visual layout or UI needed?** → take a window screenshot (Step 2C)
+- **Text/code/data visible on screen?** → copy it directly (Step 2A)
+- **Visual layout or UI needed?** → take a window screenshot (Step 2B)
 - **Never** take a full-screen screenshot
 
 ---
 
-### 2A. Copy text (cheapest)
+### 2A. Copy text (cheapest — Desktop Commander)
 
-**macOS — Desktop Commander available:**
-```bash
-~/claude-scripts/copy-text.sh "App Name"
-```
-Read stdout directly — no image tokens used.
-
-**Fallback via osascript:**
+**macOS:**
 ```bash
 osascript -e 'tell application "App Name" to activate'
+sleep 0.3
 osascript -e 'tell application "System Events" to keystroke "a" using command down'
+sleep 0.1
 osascript -e 'tell application "System Events" to keystroke "c" using command down'
+sleep 0.1
 pbpaste
 ```
 
----
-
-### 2B. Web page text / DOM (cheap)
-
-- Chrome MCP `get_page_text` → plain text of the page
-- Chrome MCP `read_page filter:interactive` → buttons, inputs, links only
-- Use these before any screenshot for web tasks
-
----
-
-### 2C. Window screenshot (only when visual is needed)
-
-**Step 1 — Scroll to relevant content first:**
-
-```bash
-~/claude-scripts/scroll-window.sh "App Name" down 3
+**Windows:**
+```powershell
+Add-Type -AssemblyName System.Windows.Forms
+[System.Windows.Forms.SendKeys]::SendWait("^a")
+Start-Sleep -Milliseconds 100
+[System.Windows.Forms.SendKeys]::SendWait("^c")
+Start-Sleep -Milliseconds 100
+[System.Windows.Forms.Clipboard]::GetText()
 ```
 
-**Step 2 — Capture the exact window bounds (not full screen):**
+Read stdout directly — no image tokens used.
 
-**macOS — Desktop Commander available (preferred):**
+---
+
+### 2B. Window screenshot (only when visual is needed)
+
+**Step 1 — Scroll to relevant content first (macOS):**
 ```bash
-~/claude-scripts/screenshot-window.sh "App Name" /tmp/lams-shot.png
+osascript -e 'tell application "App Name" to activate'
+sleep 0.3
+osascript -e 'tell application "System Events" to key code 125' # down arrow, repeat as needed
 ```
 
-**macOS — fallback via osascript + screencapture:**
+**Step 2 — Capture exact window bounds only (not full screen):**
+
+**macOS — Desktop Commander:**
 ```bash
 BOUNDS=$(osascript -e '
 tell application "System Events"
@@ -85,8 +79,9 @@ W=$(echo $BOUNDS | cut -d',' -f3 | xargs)
 H=$(echo $BOUNDS | cut -d',' -f4 | xargs)
 screencapture -R "${X},${Y},${W},${H}" /tmp/lams-shot.png
 ```
+Then read `/tmp/lams-shot.png` into vision context.
 
-**Windows — Windows-MCP available (preferred):**
+**Windows — Windows-MCP (preferred):**
 Use `mcp__Windows-MCP__Screenshot`
 
 **Windows — Desktop Commander fallback:**
@@ -98,10 +93,7 @@ $graphics = [System.Drawing.Graphics]::FromImage($bmp)
 $graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
 $bmp.Save("$env:TEMP\lams.png")
 ```
-
-**Step 3 — Read and analyse:**
-- Read the saved file into vision context
-- Use `zoom` on a specific region if only part of the image is relevant — avoid re-screenshotting
+Then read `$env:TEMP\lams.png` into vision context.
 
 ---
 
@@ -114,19 +106,9 @@ $bmp.Save("$env:TEMP\lams.png")
 
 ---
 
-## Window arrangement (macOS)
-
-If windows need repositioning before capture:
-```bash
-~/claude-scripts/arrange-windows.sh "Claude" "Google Chrome"
-```
-
----
-
 ## Notes
 
-- On macOS, always check for `~/claude-scripts/` first — use those helpers if present
-- Never take a full-screen screenshot — always capture window bounds only
+- Never take a full-screen screenshot — always capture window bounds only on macOS
 - One screenshot per task — extract everything needed before taking another
 - If capture fails after one attempt, stop and inform the user rather than retrying with the same method
 - Do not assume OS — check the system prompt before selecting a tool
