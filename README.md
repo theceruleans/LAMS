@@ -30,6 +30,19 @@ LAMS picks the cheapest method automatically — text extraction when possible, 
 
 ---
 
+## Who uses it
+
+**🟢 Beginners**
+> "I'm learning to code and keep getting errors I don't understand. I just type `/lams` and ask *'what does this error mean?'* — Claude reads my terminal, explains the problem in plain English, and tells me how to fix it. I don't have to copy-paste anything."
+
+**🟡 Freelance Developers**
+> "I'm mid-flow and something looks off in the browser. Instead of stopping to screenshot, crop, upload, and describe the problem, I type `/lams is the layout broken?` Claude grabs just my Chrome window, spots the CSS issue, and gives me the fix — all in about 3 seconds. At 30+ uses a day it adds up fast: I'm saving real time and keeping focus."
+
+**🔵 Organisations**
+> "Our support team uses Claude to help triage bugs. With LAMS installed at user scope, anyone on the team can type `/lams what error is showing?` against any app on their screen — no screenshots, no tickets with missing context, no back-and-forth. Claude reads the window directly, extracts the error text, and suggests next steps. We've cut our average triage time from 8 minutes to under 2."
+
+---
+
 ## How it works
 
 LAMS is a **Claude Code slash command** — a markdown file Claude reads as instructions when you type `/lams`. It is not an MCP server. It uses MCP tools already connected to your session to capture and read your screen, choosing the cheapest method that answers the question.
@@ -96,6 +109,8 @@ Linux support is community-tested. If you run into issues, [open an issue](https
 
 ## Installation
 
+LAMS installs at **user scope** — one install, available in every project and chat automatically. No need to add it to each repo.
+
 **macOS / Linux**
 ```bash
 curl -o ~/.claude/commands/lams.md --create-dirs https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
@@ -107,11 +122,49 @@ New-Item -ItemType Directory -Force "$env:USERPROFILE\.claude\commands" | Out-Nu
 curl.exe -o "$env:USERPROFILE\.claude\commands\lams.md" https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
 ```
 
-Restart Claude Code. The `/lams` command will be available immediately.
+Restart Claude Code. `/lams` will be available in every project immediately.
 
-Or manually copy `lams.md` into your commands directory:
-- macOS / Linux: `~/.claude/commands/`
-- Windows: `%USERPROFILE%\.claude\commands\`
+### Installation scopes explained
+
+| Scope | Location | Available in |
+|-------|----------|--------------|
+| **User** *(recommended)* | `~/.claude/commands/` | All your projects and chats |
+| **Project** | `.claude/commands/` in your repo | That project only |
+
+User scope is the default above. If you only want LAMS in one project, copy the file into that project's `.claude/commands/` folder instead.
+
+---
+
+## Organisation setup
+
+To roll out LAMS across a team so every member has it in every project automatically:
+
+**Option A — Shared dotfiles repo**
+
+Add `lams.md` to your team's shared dotfiles repo and include this in the setup script:
+
+```bash
+curl -o ~/.claude/commands/lams.md --create-dirs \
+  https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
+```
+
+Each team member runs the setup script once and gets `/lams` globally.
+
+**Option B — Project-level (monorepo or shared template)**
+
+Commit `lams.md` into `.claude/commands/` in your shared project template or monorepo. Every developer who clones the repo gets the skill automatically — no individual install needed.
+
+```bash
+mkdir -p .claude/commands
+curl -o .claude/commands/lams.md \
+  https://raw.githubusercontent.com/theceruleans/LAMS/main/lams.md
+git add .claude/commands/lams.md
+git commit -m "feat: add LAMS screen vision skill"
+```
+
+**Option C — Fork and customise**
+
+Fork this repo, modify `lams.md` for your team's stack (e.g. lock it to your internal tools, add your own token priority rules), and point your curl install at your fork. Your team gets a version tuned to your workflow.
 
 ---
 
