@@ -12,6 +12,24 @@ Type `/lams` and Claude describes what it sees. Append a question to focus the a
 
 ---
 
+## Why LAMS
+
+**Without LAMS:** take a screenshot manually, drag it into Claude, type your question. ~18 seconds per interaction.
+
+**With LAMS:** type `/lams what's wrong here?`. ~3 seconds.
+
+| | Without LAMS | With LAMS | Saving |
+|--|--|--|--|
+| Time per use | ~18 seconds | ~3 seconds | **15 seconds** |
+| Time at 20 uses/day | 6 min/day | 1 min/day | **~2.5 hrs/month** |
+| Tokens per analysis (API) | ~1,000–1,500 | ~100–500 | **Up to 90% less** |
+| API cost at 50 uses/day | ~$4.50/month | ~$0.45/month | **~$48/year** |
+| Context window used | High | Minimal | **More room for your actual work** |
+
+LAMS picks the cheapest method automatically — text extraction when possible, window-cropped screenshot only when visuals are needed. It never takes a full-screen capture.
+
+---
+
 ## How it works
 
 LAMS is a **Claude Code slash command** — a markdown file Claude reads as instructions when you type `/lams`. It is not an MCP server. It uses MCP tools already connected to your session to capture and read your screen, choosing the cheapest method that answers the question.
@@ -105,7 +123,7 @@ LAMS is distributed as a single markdown file — the simplest way to share Clau
 2. Add a one-line curl install command to your README (same pattern as above)
 3. Users drop the file into `~/.claude/commands/` and restart Claude Code
 
-That's it — no packaging, no registry, no build step.
+No packaging, no registry, no build step.
 
 ---
 
