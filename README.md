@@ -186,6 +186,37 @@ The full skill definition is in [`lams.md`](lams.md). You can paste it directly 
 
 ---
 
+## Using with Cowork
+
+[Cowork](https://claude.ai/download) is Anthropic's desktop app for non-developers. LAMS works in Cowork with one key advantage: **Desktop Commander MCP is built in** — you don't need to install it separately.
+
+### Install in Cowork
+
+**Option A — Slash command (same as Claude Code)**
+
+LAMS is already installed at user scope if you ran the curl command above. Open any Cowork session and `/lams` will be available immediately.
+
+**Option B — .skill file**
+
+Download [`lams.skill`](https://github.com/theceruleans/LAMS/releases) and double-click it. Cowork installs it automatically.
+
+**Option C — Master prompt**
+
+Paste the contents of [`lams.md`](lams.md) directly into any Cowork session. No install needed — works immediately with Desktop Commander, which is available natively in every Cowork session.
+
+### Cowork vs Claude Code
+
+| | Claude Code | Cowork |
+|--|--|--|
+| Slash command `/lams` | ✅ Native | ✅ Supported |
+| Desktop Commander | Manual install | ✅ Built in |
+| `.skill` file install | — | ✅ Native |
+| Master prompt (paste) | ✅ | ✅ |
+
+Cowork users have the smoothest setup — Desktop Commander is already there, so `/lams` works the moment you install the command file.
+
+---
+
 ## Notes
 
 - Works best with `claude-sonnet-4-6` or `claude-opus-4-6`. Run `/model claude-sonnet-4-6` if on auto-selection.
